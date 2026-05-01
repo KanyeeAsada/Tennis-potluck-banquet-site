@@ -83,7 +83,8 @@ let selectedPlayer='';
 
 function openModal(player){
   selectedPlayer=player;
-  document.getElementById('modalPlayerName').innerText=player;
+  document.getElementById('foodSelect').innerHTML =
+  '<option value=\"\">Select an item</option>' +
 
   // Remove foods already claimed by OTHER people
   const takenFoods = Object.entries(signups)
@@ -108,9 +109,16 @@ function closeModal(){
 
 function addNewItem(){
   const item = document.getElementById('newItem').value.trim();
+
   if(item && !foodItems.includes(item)){
     foodItems.push(item);
     document.getElementById('newItem').value='';
+
+    // If modal is open, refresh dropdown immediately
+    if(selectedPlayer){
+      openModal(selectedPlayer);
+    }
+
     renderAll();
   }
 }
