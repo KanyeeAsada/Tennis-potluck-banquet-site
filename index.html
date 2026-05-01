@@ -5,69 +5,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tennis Banquet Potluck</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#f7f7f7; padding:20px; }
-    .container { max-width:1200px; margin:auto; }
-    .card { background:white; padding:20px; border-radius:12px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
-    input, select, textarea { width:100%; padding:10px; margin:8px 0; }
+    body { font-family: Arial, sans-serif; background: linear-gradient(to right, #eef2ff, #f8fafc); padding:20px; }
+    .container { max-width:1400px; margin:auto; }
+    .card { background:white; padding:20px; border-radius:16px; margin-bottom:20px; box-shadow:0 6px 18px rgba(0,0,0,0.08); }
+    input, select, textarea { width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:8px; }
     .grid { display:grid; grid-template-columns: 2fr 1fr; gap:20px; }
-    .summary-item { border-bottom:1px solid #ddd; padding:10px 0; }
+    .summary-item { border-bottom:1px solid #eee; padding:10px 0; }
+    .badge { padding:6px 12px; border-radius:999px; font-size:12px; font-weight:bold; }
+    .signed { background:#dcfce7; color:#166534; }
+    .pending { background:#fee2e2; color:#991b1b; }
+    .guest-box { background:#f8fafc; padding:10px; border-radius:10px; margin-top:10px; }
   </style>
 </head>
 <body>
 <div class="container">
   <h1>🎾 End of Year Tennis Banquet Potluck</h1>
-
-  <div class="card">
-    <h2>Required Item Tracker</h2>
-    <div id="tracker"></div>
-  </div>
+  <p>Track food, guests, and who still needs to sign up.</p>
 
   <input id="search" placeholder="Search player..." onkeyup="renderPeople()" />
 
   <div class="grid">
     <div id="people-list"></div>
-    <div class="card">
-      <h2>Live Banquet Summary</h2>
-      <div id="summary"></div>
-      <h3>Total Guests: <span id="guestTotal">0</span></h3>
+
+    <div>
+      <div class="card">
+        <h2>Signup Status</h2>
+        <div id="statusBoard"></div>
+      </div>
+
+      <div class="card">
+        <h2>Live Banquet Summary</h2>
+        <div id="summary"></div>
+        <h3>Total Guests: <span id="guestTotal">0</span></h3>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
 const people = [
-'Kendall Hopkins','Olivia Swank','Julia Sagen','Charlotte Crosby','Jiyul Kim','Raya Olfatbahr','E Renzoni','Julia Franklin','Camden Hansen','Pimmada Akavanichan','Robi Marshall','Gigi Santos','Peyton Elliott','Natalie Saad','Naomi Adegbenro','Miriam Schneider','Narmin A.','Fay Alathari','Cat Hechter'
+'Kendall Hopkins','Olivia Swank','Julia Sagen','Charlotte Crosby','Jiyul Kim','Raya Olfatbahr','E Renzoni','Julia Franklin','Camden Hansen','Pimmada Akavanichan','Robi Marshall','Gigi Santos','Peyton Elliott','Natalie Saad','Naomi Adegbenro','Miriam Schneider','Narmin A.','Fay Alathari','Cat Hechter','Coach Valluri'
 ];
 
-const itemLimits = {
-  'Main Dish':3,
-  'Desserts':4,
-  'Drinks':5,
-  'Snacks/Appetizers':4,
-  'Paper Plates':2,
-  'Utensils':2,
-  'Napkins':2,
-  'Water Bottles':4
-};
+const foodItems = [
+'Biryani',
+'Pasta Tray',
+'Beans',
+'Salad Bowl',
+'Garlic Bread',
+'Fruit Tray',
+'Brownies',
+'Cookies',
+'Water Cases',
+'Soda Packs',
+'Paper Plates',
+'Utensils',
+'Napkins'
+];
 
 let signups = JSON.parse(localStorage.getItem('potluckSignups')) || {};
-
-function itemCount(item){
-  return Object.values(signups).filter(x => x.requiredItem === item).length;
-}
 
 function save(){
   localStorage.setItem('potluckSignups', JSON.stringify(signups));
   renderSummary();
-  renderTracker();
-}
-
-function renderTracker(){
-  const tracker = document.getElementById('tracker');
-  tracker.innerHTML = '';
-  for(let item in itemLimits){
-    tracker.innerHTML += `<p>${item}: ${itemCount(item)}/${itemLimits[item]} selected</p>`;
-  }
+  renderStatusBoard();
 }
 
 function renderPeople(){
@@ -77,22 +78,36 @@ function renderPeople(){
 
   people.filter(p => p.toLowerCase().includes(search)).forEach(person => {
     const current = signups[person] || {};
-    const options = Object.keys(itemLimits).map(item => {
-      const full = itemCount(item) >= itemLimits[item] && current.requiredItem !== item;
-      return `<option ${full ? 'disabled' : ''} ${current.requiredItem===item?'selected':''}>${item}</option>`;
-    }).join('');
+    const guestCount = parseInt(current.guests || 0);
 
     list.innerHTML += `
       <div class="card">
         <h3>${person}</h3>
+
         <input placeholder="Parent name (optional)" value="${current.parentName || ''}" onchange="updateField('${person}','parentName',this.value)">
-        <select onchange="updateField('${person}','requiredItem',this.value)">
-          <option value="">Select required item</option>
-          ${options}
+
+        <label>What are you bringing?</label>
+        <select onchange="updateField('${person}','food',this.value)">
+          <option value="">Select food item</option>
+          ${foodItems.map(item => `<option ${current.food===item?'selected':''}>${item}</option>`).join('')}
         </select>
+
         <input placeholder="Additional things bringing" value="${current.extras || ''}" onchange="updateField('${person}','extras',this.value)">
-        <input type="number" placeholder="Guests" value="${current.guests || ''}" onchange="updateField('${person}','guests',this.value)">
-        <textarea placeholder="Notes" onchange="updateField('${person}','notes',this.value)">${current.notes || ''}</textarea>
+
+        <label>How many guests?</label>
+        <select onchange="updateField('${person}','guests',this.value); renderPeople();">
+          <option value="">Select number</option>
+          ${[0,1,2,3,4,5].map(num => `<option ${guestCount===num?'selected':''}>${num}</option>`).join('')}
+        </select>
+
+        ${guestCount > 0 ? `
+          <div class="guest-box">
+            <label>Guest Names</label>
+            <textarea placeholder="Enter guest names separated by commas" onchange="updateField('${person}','guestNames',this.value)">${current.guestNames || ''}</textarea>
+          </div>
+        ` : ''}
+
+        <textarea placeholder="Notes (allergies, vegetarian, etc.)" onchange="updateField('${person}','notes',this.value)">${current.notes || ''}</textarea>
       </div>
     `;
   });
@@ -115,7 +130,7 @@ function renderSummary(){
     summary.innerHTML += `
       <div class="summary-item">
         <strong>${person}</strong><br>
-        ${s.requiredItem || 'Not bringing food'} ${s.extras ? '+ ' + s.extras : ''}
+        Bringing: ${s.food || 'Nothing yet'} ${s.extras ? '+ ' + s.extras : ''}
       </div>
     `;
   }
@@ -123,9 +138,26 @@ function renderSummary(){
   document.getElementById('guestTotal').innerText = guests;
 }
 
+function renderStatusBoard(){
+  const board = document.getElementById('statusBoard');
+  board.innerHTML = '';
+
+  people.forEach(person => {
+    const signed = signups[person]?.food;
+    board.innerHTML += `
+      <div class="summary-item">
+        ${person}<br>
+        <span class="badge ${signed ? 'signed' : 'pending'}">
+          ${signed ? 'Signed Up' : 'Still Needs to Sign Up'}
+        </span>
+      </div>
+    `;
+  });
+}
+
 renderPeople();
 renderSummary();
-renderTracker();
+renderStatusBoard();
 </script>
 </body>
 </html>
