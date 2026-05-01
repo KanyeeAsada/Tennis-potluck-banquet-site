@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tennis Banquet Potluck</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f7f7f7; padding:20px; }
+    .container { max-width:1200px; margin:auto; }
+    .card { background:white; padding:20px; border-radius:12px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+    input, select, textarea { width:100%; padding:10px; margin:8px 0; }
+    .grid { display:grid; grid-template-columns: 2fr 1fr; gap:20px; }
+    .summary-item { border-bottom:1px solid #ddd; padding:10px 0; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🎾 End of Year Tennis Banquet Potluck</h1>
+
+  <div class="card">
+    <h2>Required Item Tracker</h2>
+    <div id="tracker"></div>
+  </div>
+
+  <input id="search" placeholder="Search player..." onkeyup="renderPeople()" />
+
+  <div class="grid">
+    <div id="people-list"></div>
+    <div class="card">
+      <h2>Live Banquet Summary</h2>
+      <div id="summary"></div>
+      <h3>Total Guests: <span id="guestTotal">0</span></h3>
+    </div>
+  </div>
+</div>
+
+<script>
+const people = [
+'Kendall Hopkins','Olivia Swank','Julia Sagen','Charlotte Crosby','Jiyul Kim','Raya Olfatbahr','E Renzoni','Julia Franklin','Camden Hansen','Pimmada Akavanichan','Robi Marshall','Gigi Santos','Peyton Elliott','Natalie Saad','Naomi Adegbenro','Miriam Schneider','Narmin A.','Fay Alathari','Cat Hechter'
+];
+
+const itemLimits = {
+  'Main Dish':3,
+  'Desserts':4,
+  'Drinks':5,
+  'Snacks/Appetizers':4,
+  'Paper Plates':2,
+  'Utensils':2,
+  'Napkins':2,
+  'Water Bottles':4
+};
+
+let signups = JSON.parse(localStorage.getItem('potluckSignups')) || {};
+
+function itemCount(item){
+  return Object.values(signups).filter(x => x.requiredItem === item).length;
+}
+
+function save(){
+  localStorage.setItem('potluckSignups', JSON.stringify(signups));
+  renderSummary();
+  renderTracker();
+}
+
+function renderTracker(){
+  const tracker = document.getElementById('tracker');
+  tracker.innerHTML = '';
+  for(let item in itemLimits){
+    tracker.innerHTML += `<p>${item}: ${itemCount(item)}/${itemLimits[item]} selected</p>`;
+  }
+}
+
+function renderPeople(){
+  const search = document.getElementById('search').value.toLowerCase();
+  const list = document.getElementById('people-list');
+  list.innerHTML = '';
+
+  people.filter(p => p.toLowerCase().includes(search)).forEach(person => {
+    const current = signups[person] || {};
+    const options = Object.keys(itemLimits).map(item => {
+      const full = itemCount(item) >= itemLimits[item] && current.requiredItem !== item;
+      return `<option ${full ? 'disabled' : ''} ${current.requiredItem===item?'selected':''}>${item}</option>`;
+    }).join('');
+
+    list.innerHTML += `
+      <div class="card">
+        <h3>${person}</h3>
+        <input placeholder="Parent name (optional)" value="${current.parentName || ''}" onchange="updateField('${person}','parentName',this.value)">
+        <select onchange="updateField('${person}','requiredItem',this.value)">
+          <option value="">Select required item</option>
+          ${options}
+        </select>
+        <input placeholder="Additional things bringing" value="${current.extras || ''}" onchange="updateField('${person}','extras',this.value)">
+        <input type="number" placeholder="Guests" value="${current.guests || ''}" onchange="updateField('${person}','guests',this.value)">
+        <textarea placeholder="Notes" onchange="updateField('${person}','notes',this.value)">${current.notes || ''}</textarea>
+      </div>
+    `;
+  });
+}
+
+function updateField(person, field, value){
+  if(!signups[person]) signups[person] = {};
+  signups[person][field] = value;
+  save();
+}
+
+function renderSummary(){
+  const summary = document.getElementById('summary');
+  summary.innerHTML = '';
+  let guests = 0;
+
+  for(let person in signups){
+    const s = signups[person];
+    guests += parseInt(s.guests || 0);
+    summary.innerHTML += `
+      <div class="summary-item">
+        <strong>${person}</strong><br>
+        ${s.requiredItem || 'Not bringing food'} ${s.extras ? '+ ' + s.extras : ''}
+      </div>
+    `;
+  }
+
+  document.getElementById('guestTotal').innerText = guests;
+}
+
+renderPeople();
+renderSummary();
+renderTracker();
+</script>
+</body>
+</html>
