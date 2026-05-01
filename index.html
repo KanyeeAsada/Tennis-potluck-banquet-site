@@ -5,18 +5,63 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tennis Banquet Potluck</title>
 <style>
-body{font-family:Arial,sans-serif;background:#f4ebff;margin:0;padding:30px;color:#5b21b6;}
+body{
+  font-family:Arial,sans-serif;
+  background:#f4ebff;
+  margin:0;
+  padding:30px;
+  color:#5b21b6;
+}
 .container{max-width:1400px;margin:auto;}
-.top-grid{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:20px;margin-bottom:30px;}
-.card,.player-card,.modal-box{background:white;border-radius:20px;padding:20px;box-shadow:0 10px 25px rgba(109,40,217,.08);}
-.player-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;}
-.player-card{cursor:pointer;text-align:center;transition:.2s;}
-.player-card:hover{transform:translateY(-3px);}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;justify-content:center;align-items:center;}
+.top-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:20px;
+  margin-bottom:30px;
+}
+.card,.player-card,.modal-box{
+  background:white;
+  border-radius:20px;
+  padding:20px;
+  box-shadow:0 10px 25px rgba(109,40,217,.08);
+}
+.player-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+}
+.player-card{
+  cursor:pointer;
+  text-align:center;
+  transition:.2s;
+}
+.player-card:hover{transform:translateY(-4px);}
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
 .modal-box{width:400px;}
-input,select,button{width:100%;padding:12px;margin-top:10px;border-radius:12px;border:1px solid #ddd;}
-button{background:linear-gradient(135deg,#8b5cf6,#c084fc);color:white;border:none;font-weight:bold;cursor:pointer;}
-.food-item.claimed{text-decoration:line-through;opacity:.5;font-style:italic;}
+input,select,button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:12px;
+  border:1px solid #ddd;
+}
+button{
+  background:linear-gradient(135deg,#8b5cf6,#c084fc);
+  color:white;
+  border:none;
+  font-weight:bold;
+  cursor:pointer;
+}
+.status-done{color:green;font-weight:bold;}
+.status-pending{color:#999;}
+.food-item.claimed{text-decoration:line-through;opacity:.5;}
 </style>
 </head>
 <body>
@@ -24,87 +69,108 @@ button{background:linear-gradient(135deg,#8b5cf6,#c084fc);color:white;border:non
 <h1 style="text-align:center;">🎾 End of Year Tennis Banquet Potluck</h1>
 
 <div class="top-grid">
-<div class="card"><h2>Live Banquet Summary</h2><div id="summary"></div></div>
-<div class="card"><h2>Current Potluck Items</h2>
-<input id="newItem" placeholder="Add taco/burrito item or supplies...">
-<button onclick="addNewItem()">Add</button>
-<div id="itemBoard"></div></div>
-<div class="card"><h2>Signup Status</h2><div id="statusBoard"></div></div>
+  <div class="card">
+    <h2>Signup Tracker</h2>
+    <div id="statusBoard"></div>
+  </div>
+
+  <div class="card">
+    <h2>Total Guest Count</h2>
+    <h1 id="guestCounter">0</h1>
+  </div>
+
+  <div class="card">
+    <h2>Potluck Items Claimed</h2>
+    <div id="itemBoard"></div>
+  </div>
 </div>
 
-<h2 style="text-align:center;">PLAYER SIGN UP</h2>
+<h2 style="text-align:center;">Click Your Name to Sign Up</h2>
 <div class="player-grid" id="playerGrid"></div>
 </div>
 
 <div class="modal" id="signupModal">
-<div class="modal-box">
-<h2 id="modalPlayerName"></h2>
-<select id="foodSelect"></select>
-<select id="guestSelect">
-<option value="0">0 Guests</option>
-<option value="1">1 Guest</option>
-<option value="2">2 Guests</option>
-<option value="3">3 Guests</option>
-<option value="4">4 Guests</option>
-<option value="5">5 Guests</option>
-</select>
-<button onclick="submitSignup()">Submit Signup</button>
-<button onclick="closeModal()">Close</button>
-</div>
+  <div class="modal-box">
+    <h2 id="modalPlayerName"></h2>
+
+    <label>What are you bringing?</label>
+    <select id="foodSelect"></select>
+
+    <label>How many guests?</label>
+    <select id="guestSelect">
+      <option value="0">0</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select>
+
+    <button onclick="submitSignup()">Submit</button>
+    <button onclick="closeModal()">Close</button>
+  </div>
 </div>
 
 <script>
-const people=['Olivia Swank','Charlotte Crosby','Kendall Hopkins','Julia Sagen','Jiyul Kim','Raya Olfatbahr','E Renzoni','Camden Hansen','Julia Franklin','Pimmada Akavanichan','Robi Marshall','Gigi Santos','Peyton Elliott','Natalie Saad','Naomi Adegbenro','Miriam Schneider','Narmin A.','Fay Alathari','Cat Hechter','Coach Valluri'];
-let foodItems=['Tortillas','Taco Meat','Chicken','Beans','Rice','Cheese','Lettuce','Salsa','Guacamole','Sour Cream','Chips','Queso','Drinks','Plates','Napkins','Utensils'];
+const people=[
+'Olivia Swank','Charlotte Crosby','Kendall Hopkins','Julia Sagen','Jiyul Kim','Raya Olfatbahr','E Renzoni','Camden Hansen','Julia Franklin','Pimmada Akavanichan','Robi Marshall','Gigi Santos','Peyton Elliott','Natalie Saad','Naomi Adegbenro','Miriam Schneider','Narmin A.','Fay Alathari','Cat Hechter','Coach Valluri'
+];
+
+let foodItems=[
+'Tortillas','Taco Meat','Chicken','Beans','Rice','Cheese','Lettuce','Salsa','Guacamole','Sour Cream','Chips','Queso','Drinks','Plates','Napkins','Utensils'
+];
+
 let signups={};
 let selectedPlayer='';
 
-function addNewItem(){
- const item=document.getElementById('newItem').value.trim();
- if(item){foodItems.push(item);document.getElementById('newItem').value='';renderAll();}
-}
-
 function openModal(player){
- selectedPlayer=player;
- document.getElementById('modalPlayerName').innerText=player;
- document.getElementById('foodSelect').innerHTML='<option>Select an item</option>'+foodItems.map(item=>`<option>${item}</option>`).join('');
- document.getElementById('signupModal').style.display='flex';
+  selectedPlayer=player;
+  document.getElementById('modalPlayerName').innerText=player;
+  document.getElementById('foodSelect').innerHTML=
+    '<option>Select an item</option>'+
+    foodItems.map(item=>`<option>${item}</option>`).join('');
+  document.getElementById('signupModal').style.display='flex';
 }
 
 function closeModal(){
- document.getElementById('signupModal').style.display='none';
+  document.getElementById('signupModal').style.display='none';
 }
 
 function submitSignup(){
- signups[selectedPlayer]={
-   food:document.getElementById('foodSelect').value,
-   guests:document.getElementById('guestSelect').value
- };
- closeModal();
- renderAll();
+  signups[selectedPlayer]={
+    food:document.getElementById('foodSelect').value,
+    guests:Number(document.getElementById('guestSelect').value)
+  };
+  closeModal();
+  renderAll();
 }
 
 function renderAll(){
- document.getElementById('playerGrid').innerHTML=people.map(person=>`
-   <div class="player-card" onclick="openModal('${person}')">
-     <h3>${person}</h3>
-     <p>Click to sign up ✨</p>
-   </div>
- `).join('');
+  // Names only on front page
+  document.getElementById('playerGrid').innerHTML=people.map(person=>`
+    <div class="player-card" onclick="openModal('${person}')">
+      <h3>${person}</h3>
+    </div>
+  `).join('');
 
- document.getElementById('summary').innerHTML=Object.entries(signups).map(([p,s])=>`
-   <div><strong>${p}</strong><br>${s.food}<br>${s.guests} guests</div><hr>
- `).join('');
+  // Left side status tracker
+  document.getElementById('statusBoard').innerHTML=people.map(person=>`
+    <div class="${signups[person]?'status-done':'status-pending'}">
+      ${person} — ${signups[person]?'✅ Done':'⏳ Pending'}
+    </div>
+  `).join('');
 
- document.getElementById('itemBoard').innerHTML=foodItems.map(item=>{
-   const claimed=Object.values(signups).some(s=>s.food===item);
-   return `<div class="food-item ${claimed?'claimed':''}">${item}</div>`;
- }).join('');
+  // Guest counter
+  const totalGuests=Object.values(signups).reduce((sum,s)=>sum+s.guests,0);
+  document.getElementById('guestCounter').innerText=totalGuests;
 
- document.getElementById('statusBoard').innerHTML=people.map(person=>`
-   <div>${person} — ${signups[person]?'✅ Signed Up':'⏳ Pending'}</div>
- `).join('');
+  // Claimed food tracker
+  document.getElementById('itemBoard').innerHTML=foodItems.map(item=>{
+    const claimed=Object.values(signups).some(s=>s.food===item);
+    return `<div class="food-item ${claimed?'claimed':''}">${item}</div>`;
+  }).join('');
 }
+
 renderAll();
 </script>
 </body>
