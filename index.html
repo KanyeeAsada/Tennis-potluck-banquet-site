@@ -1,45 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tennis Banquet Potluck</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: linear-gradient(to right, #eef2ff, #f8fafc); padding:20px; }
-    .container { max-width:1400px; margin:auto; }
-    .card { background:white; padding:20px; border-radius:16px; margin-bottom:20px; box-shadow:0 6px 18px rgba(0,0,0,0.08); }
-    input, select, textarea { width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:8px; }
-    .grid { display:grid; grid-template-columns: 2fr 1fr; gap:20px; }
-    .summary-item { border-bottom:1px solid #eee; padding:10px 0; }
-    .badge { padding:6px 12px; border-radius:999px; font-size:12px; font-weight:bold; }
-    .signed { background:#dcfce7; color:#166534; }
-    .pending { background:#fee2e2; color:#991b1b; }
-    .guest-box { background:#f8fafc; padding:10px; border-radius:10px; margin-top:10px; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tennis Banquet Potluck</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #5b21b6, #7c3aed, #c084fc);
+  min-height: 100vh;
+  margin: 0;
+  padding: 30px;
+  color: white;
+}
+.container { max-width: 1400px; margin: auto; }
+.card {
+  background: rgba(255,255,255,0.95);
+  color: black;
+  padding: 20px;
+  border-radius: 18px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+input, select, textarea, button {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+button {
+  background: #7c3aed;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+button:hover { background: #6d28d9; }
+.grid { display:grid; grid-template-columns: 2fr 1fr; gap:20px; }
+.summary-item { border-bottom:1px solid #eee; padding:10px 0; }
+.badge { padding:6px 12px; border-radius:999px; font-size:12px; font-weight:bold; }
+.signed { background:#dcfce7; color:#166534; }
+.pending { background:#fee2e2; color:#991b1b; }
+</style>
 </head>
 <body>
 <div class="container">
-  <h1>🎾 End of Year Tennis Banquet Potluck</h1>
-  <p>Track food, guests, and who still needs to sign up.</p>
+<h1>🎾 End of Year Tennis Banquet Potluck</h1>
+<p>Track food, guests, and who still needs to sign up.</p>
 
-  <input id="search" placeholder="Search player..." onkeyup="renderPeople()" />
+<input id="search" placeholder="Search player..." onkeyup="renderPeople()" />
 
-  <div class="grid">
+<div class="grid">
+  <div>
+    <div class="card">
+      <h2>Add New Potluck Item</h2>
+      <input id="newItem" placeholder="Ex: Paneer, Balloons, Ice, Cake" />
+      <button onclick="addNewItem()">Add Item</button>
+    </div>
+
     <div id="people-list"></div>
+  </div>
 
-    <div>
-      <div class="card">
-        <h2>Signup Status</h2>
-        <div id="statusBoard"></div>
-      </div>
+  <div>
+    <div class="card">
+      <h2>Signup Status</h2>
+      <div id="statusBoard"></div>
+    </div>
 
-      <div class="card">
-        <h2>Live Banquet Summary</h2>
-        <div id="summary"></div>
-        <h3>Total Guests: <span id="guestTotal">0</span></h3>
-      </div>
+    <div class="card">
+      <h2>Current Potluck Items</h2>
+      <div id="itemBoard"></div>
+    </div>
+
+    <div class="card">
+      <h2>Live Banquet Summary</h2>
+      <div id="summary"></div>
+      <h3>Total Guests: <span id="guestTotal">0</span></h3>
     </div>
   </div>
+</div>
 </div>
 
 <script>
@@ -47,28 +87,28 @@ const people = [
 'Kendall Hopkins','Olivia Swank','Julia Sagen','Charlotte Crosby','Jiyul Kim','Raya Olfatbahr','E Renzoni','Julia Franklin','Camden Hansen','Pimmada Akavanichan','Robi Marshall','Gigi Santos','Peyton Elliott','Natalie Saad','Naomi Adegbenro','Miriam Schneider','Narmin A.','Fay Alathari','Cat Hechter','Coach Valluri'
 ];
 
-const foodItems = [
-'Biryani',
-'Pasta Tray',
-'Beans',
-'Salad Bowl',
-'Garlic Bread',
-'Fruit Tray',
-'Brownies',
-'Cookies',
-'Water Cases',
-'Soda Packs',
-'Paper Plates',
-'Utensils',
-'Napkins'
+let foodItems = JSON.parse(localStorage.getItem('foodItems')) || [
+'Biryani','Pasta Tray','Beans','Salad Bowl','Garlic Bread','Fruit Tray','Brownies','Cookies','Water Cases','Soda Packs','Paper Plates','Utensils','Napkins'
 ];
 
 let signups = JSON.parse(localStorage.getItem('potluckSignups')) || {};
 
 function save(){
   localStorage.setItem('potluckSignups', JSON.stringify(signups));
+  localStorage.setItem('foodItems', JSON.stringify(foodItems));
   renderSummary();
   renderStatusBoard();
+  renderItemBoard();
+}
+
+function addNewItem(){
+  const item = document.getElementById('newItem').value.trim();
+  if(item && !foodItems.includes(item)){
+    foodItems.push(item);
+    document.getElementById('newItem').value = '';
+    save();
+    renderPeople();
+  }
 }
 
 function renderPeople(){
@@ -83,40 +123,54 @@ function renderPeople(){
     list.innerHTML += `
       <div class="card">
         <h3>${person}</h3>
-
         <input placeholder="Parent name (optional)" value="${current.parentName || ''}" onchange="updateField('${person}','parentName',this.value)">
 
         <label>What are you bringing?</label>
-        <select onchange="updateField('${person}','food',this.value)">
-          <option value="">Select food item</option>
+        <select id="food-${person}">
+          <option value="">Select item</option>
           ${foodItems.map(item => `<option ${current.food===item?'selected':''}>${item}</option>`).join('')}
         </select>
 
-        <input placeholder="Additional things bringing" value="${current.extras || ''}" onchange="updateField('${person}','extras',this.value)">
+        <input id="extras-${person}" placeholder="Additional things bringing" value="${current.extras || ''}">
 
         <label>How many guests?</label>
-        <select onchange="updateField('${person}','guests',this.value); renderPeople();">
+        <select id="guests-${person}" onchange="toggleGuestBox('${person}', this.value)">
           <option value="">Select number</option>
           ${[0,1,2,3,4,5].map(num => `<option ${guestCount===num?'selected':''}>${num}</option>`).join('')}
         </select>
 
-        ${guestCount > 0 ? `
-          <div class="guest-box">
-            <label>Guest Names</label>
-            <textarea placeholder="Enter guest names separated by commas" onchange="updateField('${person}','guestNames',this.value)">${current.guestNames || ''}</textarea>
-          </div>
-        ` : ''}
+        <div id="guest-box-${person}">
+          ${guestCount > 0 ? `<textarea id="guestNames-${person}" placeholder="Enter guest names">${current.guestNames || ''}</textarea>` : ''}
+        </div>
 
-        <textarea placeholder="Notes (allergies, vegetarian, etc.)" onchange="updateField('${person}','notes',this.value)">${current.notes || ''}</textarea>
+        <textarea id="notes-${person}" placeholder="Notes">${current.notes || ''}</textarea>
+
+        <button onclick="submitSignup('${person}')">Submit Signup</button>
       </div>
     `;
   });
 }
 
-function updateField(person, field, value){
-  if(!signups[person]) signups[person] = {};
-  signups[person][field] = value;
+function toggleGuestBox(person, count){
+  const box = document.getElementById(`guest-box-${person}`);
+  if(parseInt(count) > 0){
+    box.innerHTML = `<textarea id="guestNames-${person}" placeholder="Enter guest names"></textarea>`;
+  } else {
+    box.innerHTML = '';
+  }
+}
+
+function submitSignup(person){
+  signups[person] = {
+    parentName: document.querySelector(`input[placeholder='Parent name (optional)']`)?.value || '',
+    food: document.getElementById(`food-${person}`).value,
+    extras: document.getElementById(`extras-${person}`).value,
+    guests: document.getElementById(`guests-${person}`).value,
+    guestNames: document.getElementById(`guestNames-${person}`)?.value || '',
+    notes: document.getElementById(`notes-${person}`).value
+  };
   save();
+  alert('Signup submitted!');
 }
 
 function renderSummary(){
@@ -134,14 +188,12 @@ function renderSummary(){
       </div>
     `;
   }
-
   document.getElementById('guestTotal').innerText = guests;
 }
 
 function renderStatusBoard(){
   const board = document.getElementById('statusBoard');
   board.innerHTML = '';
-
   people.forEach(person => {
     const signed = signups[person]?.food;
     board.innerHTML += `
@@ -155,9 +207,18 @@ function renderStatusBoard(){
   });
 }
 
+function renderItemBoard(){
+  const board = document.getElementById('itemBoard');
+  board.innerHTML = '';
+  foodItems.forEach(item => {
+    board.innerHTML += `<div class="summary-item">${item}</div>`;
+  });
+}
+
 renderPeople();
 renderSummary();
 renderStatusBoard();
+renderItemBoard();
 </script>
 </body>
 </html>
