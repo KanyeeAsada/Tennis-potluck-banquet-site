@@ -140,8 +140,8 @@
 </head>
 <body>
 <div class="container">
-  <h1>Potomac Falls High School - End of Year Tennis Banquet Potluck!!</h1>
-  <p class="subtitle">Instructions: Scroll Down, Click on your name, choose what you are bringing, and add your guest count.</p>
+  <h1>🎾 End of Year Tennis Banquet Potluck</h1>
+  <p class="subtitle">Click your name, choose what you’re bringing, and add your guest count.</p>
 
   <div class="top-grid">
     <div class="card">
@@ -172,7 +172,8 @@
     <h2 id="modalPlayerName"></h2>
 
     <label for="foodSelect">What are you bringing?</label>
-    <select id="foodSelect"></select>
+    <select id="foodSelect" multiple size="8"></select>
+    <p class="mini-text">Hold Ctrl (Windows) or Cmd (Mac) to select multiple items.</p>
 
     <label for="guestSelect">How many extra guests?</label>
     <select id="guestSelect">
@@ -223,21 +224,21 @@ function loadData(){
 
 function getTakenFoods(playerToIgnore){
   return Object.entries(signups)
-    .filter(([name, data]) => name !== playerToIgnore && data.food)
-    .map(([name, data]) => data.food);
+    .filter(([name]) => name !== playerToIgnore)
+    .flatMap(([, data]) => data.food || []);
 }
 
 function renderFoodDropdown(player){
   const takenFoods = getTakenFoods(player);
-  const currentFood = signups[player]?.food || '';
+  const currentFood = signups[player]?.food || [];
 
   const availableFoods = foodItems.filter(item => {
-    return !takenFoods.includes(item) || item === currentFood;
+    return !takenFoods.includes(item) || currentFood.includes(item);
   });
 
   let options = '<option value="">Select an item</option>';
   options += availableFoods.map(item => {
-    const selected = item === currentFood ? 'selected' : '';
+    const selected = currentFood.includes(item) ? 'selected' : '';
     return `<option value="${escapeHTML(item)}" ${selected}>${escapeHTML(item)}</option>`;
   }).join('');
 
@@ -279,10 +280,10 @@ function addNewItem(){
 }
 
 function submitSignup(){
-  const food = document.getElementById('foodSelect').value;
+  const food = Array.from(document.getElementById('foodSelect').selectedOptions).map(option => option.value);
   const guests = Number(document.getElementById('guestSelect').value);
 
-  if(!food){
+  if(food.length === 0){
     alert('Please select what you are bringing.');
     return;
   }
@@ -339,7 +340,7 @@ function renderGuestCounter(){
 }
 
 function renderItemBoard(){
-  const entries = Object.entries(signups).filter(([name, data]) => data.food);
+  const entries = Object.entries(signups).filter(([name, data]) => data.food && data.food.length > 0);
 
   if(entries.length === 0){
     document.getElementById('itemBoard').innerHTML = '<p class="empty-note">No items claimed yet.</p>';
@@ -348,7 +349,7 @@ function renderItemBoard(){
 
   document.getElementById('itemBoard').innerHTML = entries.map(([person, data]) => `
     <div class="claimed-row">
-      <span><strong>${escapeHTML(data.food)}</strong></span>
+      <span><strong>${data.food.map(item => escapeHTML(item)).join(', ')}</strong></span>
       <span class="claimed-by">claimed by ${escapeHTML(person)}</span>
     </div>
   `).join('');
