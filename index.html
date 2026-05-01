@@ -1,64 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
-<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Tennis Banquet Potluck</title>
 <style>
-body{font-family:Arial,sans-serif;background:#f4ebff;margin:0;padding:30px;color:#5b21b6;overflow-x:hidden;}
-.container{max-width:1400px;margin:auto;}
-.top-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:30px;}
-.card,.player-card,.modal-box{background:white;border-radius:20px;padding:20px;box-shadow:0 10px 25px rgba(109,40,217,.08);}
-.player-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;}
-.player-card{cursor:pointer;text-align:center;transition:.2s;}
-.player-card:hover{transform:translateY(-4px);}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;justify-content:center;align-items:center;}
-.modal-box{width:400px;}
-input,select,button{width:100%;padding:12px;margin-top:10px;border-radius:12px;border:1px solid #ddd;}
-button{background:linear-gradient(135deg,#8b5cf6,#c084fc);color:white;border:none;font-weight:bold;cursor:pointer;}
-.status-done{color:green;font-weight:bold;}
-.status-pending{color:#999;}
-.counter{font-size:48px;text-align:center;font-weight:bold;}
-.confetti{position:fixed;top:-10px;font-size:20px;animation:fall 2s linear forwards;pointer-events:none;}
-@keyframes fall{to{transform:translateY(100vh) rotate(360deg);opacity:0;}}
+  *{box-sizing:border-box;}
+  body{
+    font-family:Arial,sans-serif;
+    background:#f4ebff;
+    margin:0;
+    padding:30px;
+    color:#5b21b6;
+    overflow-x:hidden;
+  }
+  .container{max-width:1400px;margin:auto;}
+  h1,h2,h3,p{margin-top:0;}
+  h1{text-align:center;font-size:38px;margin-bottom:10px;}
+  .subtitle{text-align:center;margin-bottom:28px;font-size:17px;}
+
+  .top-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:20px;
+    margin-bottom:30px;
+  }
+  .card,.player-card,.modal-box{
+    background:white;
+    border-radius:20px;
+    padding:20px;
+    box-shadow:0 10px 25px rgba(109,40,217,.08);
+  }
+  .card h2{font-size:22px;margin-bottom:14px;}
+
+  .counter{
+    font-size:54px;
+    text-align:center;
+    font-weight:bold;
+    margin:14px 0;
+  }
+  .mini-text{text-align:center;color:#7c3aed;margin-bottom:0;}
+
+  .status-row{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    padding:8px 0;
+    border-bottom:1px solid #eee4ff;
+    font-size:14px;
+  }
+  .status-done{color:green;font-weight:bold;}
+  .status-pending{color:#a3a3a3;}
+
+  .claimed-row{
+    padding:10px;
+    margin:8px 0;
+    background:#faf5ff;
+    border-radius:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+  }
+  .claimed-by{font-size:14px;color:#7c3aed;text-align:right;}
+  .empty-note{color:#999;margin:0;}
+
+  input,select,button{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border-radius:12px;
+    border:1px solid #ddd;
+    font-size:14px;
+  }
+  button{
+    background:linear-gradient(135deg,#8b5cf6,#c084fc);
+    color:white;
+    border:none;
+    font-weight:bold;
+    cursor:pointer;
+  }
+  button:hover{opacity:.92;}
+  .secondary-btn{background:#ede9fe;color:#5b21b6;}
+
+  /* KEEPING THE NAME LAYOUT CLEAN + SIMPLE */
+  .player-grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:20px;
+  }
+  .player-card{
+    min-height:100px;
+    cursor:pointer;
+    text-align:center;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.2s;
+  }
+  .player-card:hover{transform:translateY(-4px);}
+  .player-card h3{margin:0;font-size:18px;}
+  .player-card.submitted{outline:3px solid #bbf7d0;}
+
+  .modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.5);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    z-index:10;
+  }
+  .modal-box{width:420px;max-width:100%;}
+  .modal-box label{display:block;margin-top:14px;font-weight:bold;}
+
+  .confetti{
+    position:fixed;
+    top:-20px;
+    font-size:22px;
+    animation:fall linear forwards;
+    pointer-events:none;
+    z-index:999;
+  }
+  @keyframes fall{
+    to{transform:translateY(110vh) rotate(360deg);opacity:0;}
+  }
+
+  @media(max-width:1100px){
+    .top-grid{grid-template-columns:1fr;}
+    .player-grid{grid-template-columns:repeat(3,1fr);}
+  }
+  @media(max-width:700px){
+    body{padding:18px;}
+    .player-grid{grid-template-columns:1fr;}
+    h1{font-size:30px;}
+  }
 </style>
 </head>
 <body>
 <div class="container">
-<h1 style="text-align:center;">🎾 End of Year Tennis Banquet Potluck</h1>
+  <h1>🎾 End of Year Tennis Banquet Potluck</h1>
+  <p class="subtitle">Click your name, choose what you’re bringing, and add your guest count.</p>
 
-<div class="top-grid">
-  <div class="card">
-    <h2>Signup Tracker</h2>
-    <div id="statusBoard"></div>
+  <div class="top-grid">
+    <div class="card">
+      <h2>Signup Tracker</h2>
+      <div id="statusBoard"></div>
+    </div>
+
+    <div class="card">
+      <h2>Total Guest Count</h2>
+      <div class="counter" id="guestCounter">0</div>
+      <p class="mini-text">Players signed up + extra guests</p>
+    </div>
+
+    <div class="card">
+      <h2>Potluck Items Claimed</h2>
+      <input id="newItem" placeholder="Add a potluck item..." />
+      <button onclick="addNewItem()">Add Item</button>
+      <div id="itemBoard" style="margin-top:14px;"></div>
+    </div>
   </div>
 
-  <div class="card">
-    <h2>Total Attendance</h2>
-    <div class="counter" id="guestCounter">0</div>
-    <p style="text-align:center;">Players + Guests</p>
-  </div>
-
-  <div class="card">
-    <h2>Claimed Potluck Items</h2>
-    <input id="newItem" placeholder="Add a potluck item...">
-    <button onclick="addNewItem()">Add Item</button>
-    <div id="itemBoard"></div>
-  </div>
+  <h2 style="text-align:center;">Click Your Name to Sign Up</h2>
+  <div class="player-grid" id="playerGrid"></div>
 </div>
 
-<h2 style="text-align:center;">PLAYER SIGN UP</h2>
-<div class="player-grid" id="playerGrid"></div>
-</div>
-
-<div class="modal" id="signupModal">
+<div class="modal" id="signupModal" onclick="clickOutsideModal(event)">
   <div class="modal-box">
     <h2 id="modalPlayerName"></h2>
-    <label>What are you bringing?</label>
+
+    <label for="foodSelect">What are you bringing?</label>
     <select id="foodSelect"></select>
 
-    <label>How many extra guests?</label>
+    <label for="guestSelect">How many extra guests?</label>
     <select id="guestSelect">
       <option value="0">0</option>
       <option value="1">1</option>
@@ -69,112 +185,189 @@ button{background:linear-gradient(135deg,#8b5cf6,#c084fc);color:white;border:non
     </select>
 
     <button onclick="submitSignup()">Submit</button>
-    <button onclick="closeModal()">Close</button>
+    <button class="secondary-btn" onclick="closeModal()">Close</button>
   </div>
 </div>
 
 <script>
-const people=['Olivia Swank','Charlotte Crosby','Kendall Hopkins','Julia Sagen','Jiyul Kim','Raya Olfatbahr','E Renzoni','Camden Hansen','Julia Franklin','Pimmada Akavanichan','Robi Marshall','Gigi Santos','Peyton Elliott','Natalie Saad','Naomi Adegbenro','Miriam Schneider','Narmin A.','Fay Alathari','Cat Hechter','Coach Valluri'];
+const people = [
+  'Olivia Swank','Charlotte Crosby','Kendall Hopkins','Julia Sagen','Jiyul Kim',
+  'Raya Olfatbahr','E Renzoni','Camden Hansen','Julia Franklin','Pimmada Akavanichan',
+  'Robi Marshall','Gigi Santos','Peyton Elliott','Natalie Saad','Naomi Adegbenro',
+  'Miriam Schneider','Narmin A.','Fay Alathari','Cat Hechter','Coach Valluri'
+];
 
-let foodItems=['Tortillas','Taco Meat','Chicken','Beans','Rice','Cheese','Lettuce','Salsa','Diced Tomatoes','Guacamole','Sour Cream','Chips','Queso','Vegetable Tray','Fruit Tray','Drinks #1','Drinks #2','Drinks #3','Snacks #1','Snacks #2','Candy #1','Candy #2','Plates, Bowls, & Cups','Napkins','Forks, Spoons, Serving Tongs','Purple Balloons','Table Cloths','Decorations'];
+let foodItems = [
+  'Tortillas','Taco Meat','Chicken','Beans','Rice','Cheese','Lettuce','Salsa',
+  'Diced Tomatoes','Guacamole','Sour Cream','Chips','Queso','Vegetable Tray','Fruit Tray',
+  'Drinks #1','Drinks #2','Drinks #3','Snacks #1','Snacks #2','Candy #1','Candy #2',
+  'Plates, Bowls, & Cups','Napkins','Forks, Spoons, Serving Tongs','Purple Balloons',
+  'Table Cloths','Decorations'
+];
 
-let signups={};
-let selectedPlayer='';
+let signups = {};
+let selectedPlayer = '';
+
+function saveData(){
+  localStorage.setItem('tennisPotluckSignups', JSON.stringify(signups));
+  localStorage.setItem('tennisPotluckFoodItems', JSON.stringify(foodItems));
+}
+
+function loadData(){
+  const savedSignups = localStorage.getItem('tennisPotluckSignups');
+  const savedFoodItems = localStorage.getItem('tennisPotluckFoodItems');
+
+  if(savedSignups) signups = JSON.parse(savedSignups);
+  if(savedFoodItems) foodItems = JSON.parse(savedFoodItems);
+}
+
+function getTakenFoods(playerToIgnore){
+  return Object.entries(signups)
+    .filter(([name, data]) => name !== playerToIgnore && data.food)
+    .map(([name, data]) => data.food);
+}
+
+function renderFoodDropdown(player){
+  const takenFoods = getTakenFoods(player);
+  const currentFood = signups[player]?.food || '';
+
+  const availableFoods = foodItems.filter(item => {
+    return !takenFoods.includes(item) || item === currentFood;
+  });
+
+  let options = '<option value="">Select an item</option>';
+  options += availableFoods.map(item => {
+    const selected = item === currentFood ? 'selected' : '';
+    return `<option value="${escapeHTML(item)}" ${selected}>${escapeHTML(item)}</option>`;
+  }).join('');
+
+  document.getElementById('foodSelect').innerHTML = options;
+}
 
 function openModal(player){
-  selectedPlayer=player;
-  document.getElementById('foodSelect').innerHTML =
-  '<option value=\"\">Select an item</option>' +
-
-  // Remove foods already claimed by OTHER people
-  const takenFoods = Object.entries(signups)
-    .filter(([name]) => name !== player)
-    .map(([,data]) => data.food);
-
-  const availableFoods = foodItems.filter(item => !takenFoods.includes(item));
-
-  document.getElementById('foodSelect').innerHTML =
-    '<option>Select an item</option>' +
-    availableFoods.map(item =>
-      `<option ${signups[player]?.food===item?'selected':''}>${item}</option>`
-    ).join('');
-
+  selectedPlayer = player;
+  document.getElementById('modalPlayerName').innerText = player;
+  renderFoodDropdown(player);
   document.getElementById('guestSelect').value = signups[player]?.guests ?? 0;
-  document.getElementById('signupModal').style.display='flex';
+  document.getElementById('signupModal').style.display = 'flex';
 }
 
 function closeModal(){
-  document.getElementById('signupModal').style.display='none';
+  document.getElementById('signupModal').style.display = 'none';
+}
+
+function clickOutsideModal(event){
+  if(event.target.id === 'signupModal') closeModal();
 }
 
 function addNewItem(){
-  const item = document.getElementById('newItem').value.trim();
+  const input = document.getElementById('newItem');
+  const item = input.value.trim();
 
-  if(item && !foodItems.includes(item)){
-    foodItems.push(item);
-    document.getElementById('newItem').value='';
+  if(!item) return;
 
-    // If modal is open, refresh dropdown immediately
-    if(selectedPlayer){
-      openModal(selectedPlayer);
-    }
-
-    renderAll();
+  const alreadyExists = foodItems.some(existing => existing.toLowerCase() === item.toLowerCase());
+  if(alreadyExists){
+    alert('That item is already on the list.');
+    return;
   }
+
+  foodItems.push(item);
+  input.value = '';
+  saveData();
+  renderAll();
 }
 
 function submitSignup(){
-  signups[selectedPlayer]={
-    food:document.getElementById('foodSelect').value,
-    guests:Number(document.getElementById('guestSelect').value)
-  };
+  const food = document.getElementById('foodSelect').value;
+  const guests = Number(document.getElementById('guestSelect').value);
 
+  if(!food){
+    alert('Please select what you are bringing.');
+    return;
+  }
+
+  signups[selectedPlayer] = { food, guests };
+  saveData();
   closeModal();
   launchConfetti();
   renderAll();
 }
 
 function launchConfetti(){
-  for(let i=0;i<25;i++){
-    const confetti=document.createElement('div');
-    confetti.className='confetti';
-    confetti.innerText=['🎉','✨','🎊'][Math.floor(Math.random()*3)];
-    confetti.style.left=Math.random()*100+'vw';
-    confetti.style.animationDuration=(Math.random()*2+1)+'s';
+  for(let i=0;i<35;i++){
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti';
+    confetti.innerText = ['🎉','✨','🎊','💜'][Math.floor(Math.random()*4)];
+    confetti.style.left = Math.random()*100 + 'vw';
+    confetti.style.animationDuration = (Math.random()*1.8 + 1.2) + 's';
     document.body.appendChild(confetti);
-    setTimeout(()=>confetti.remove(),3000);
+    setTimeout(() => confetti.remove(), 3200);
   }
 }
 
 function renderAll(){
-  // KEEP THE EXACT NAMES-ONLY CARD LAYOUT
-  document.getElementById('playerGrid').innerHTML=people.map(person=>`
-    <div class="player-card" onclick="openModal('${person}')">
-      <h3>${person}</h3>
-      <p>${signups[person] ? '✅ Submitted (click to edit)' : 'Click to sign up ✨'}</p>
-    </div>
-  `).join('');
-
-  // Signup tracker
-  document.getElementById('statusBoard').innerHTML=people.map(person=>`
-    <div class="${signups[person]?'status-done':'status-pending'}">
-      ${person} — ${signups[person]?'✅ Done':'⏳ Pending'}
-    </div>
-  `).join('');
-
-  // Total attendance = signed-up players + guests
-  const totalAttendance = Object.keys(signups).length + Object.values(signups).reduce((sum,s)=>sum+s.guests,0);
-  document.getElementById('guestCounter').innerText = totalAttendance;
-
-  // Claimed items list
-  document.getElementById('itemBoard').innerHTML = Object.entries(signups).map(([person,data])=>`
-  <div style="padding:10px;margin:8px 0;background:#faf5ff;border-radius:12px;display:flex;justify-content:space-between;align-items:center;">
-    <span><strong>${data.food}</strong></span>
-    <span style="font-size:14px;color:#7c3aed;">claimed by ${person}</span>
-  </div>
-`).join('') || '<p>No items claimed yet</p>';
+  renderPlayerGrid();
+  renderStatusBoard();
+  renderGuestCounter();
+  renderItemBoard();
 }
 
+function renderPlayerGrid(){
+  document.getElementById('playerGrid').innerHTML = people.map(person => `
+    <div class="player-card ${signups[person] ? 'submitted' : ''}" onclick="openModal('${escapeJS(person)}')">
+      <h3>${escapeHTML(person)}</h3>
+    </div>
+  `).join('');
+}
+
+function renderStatusBoard(){
+  document.getElementById('statusBoard').innerHTML = people.map(person => `
+    <div class="status-row">
+      <span>${escapeHTML(person)}</span>
+      <span class="${signups[person] ? 'status-done' : 'status-pending'}">
+        ${signups[person] ? '✅ Done' : '⏳ Pending'}
+      </span>
+    </div>
+  `).join('');
+}
+
+function renderGuestCounter(){
+  const signedUpPlayers = Object.keys(signups).length;
+  const extraGuests = Object.values(signups).reduce((sum, entry) => sum + Number(entry.guests || 0), 0);
+  document.getElementById('guestCounter').innerText = signedUpPlayers + extraGuests;
+}
+
+function renderItemBoard(){
+  const entries = Object.entries(signups).filter(([name, data]) => data.food);
+
+  if(entries.length === 0){
+    document.getElementById('itemBoard').innerHTML = '<p class="empty-note">No items claimed yet.</p>';
+    return;
+  }
+
+  document.getElementById('itemBoard').innerHTML = entries.map(([person, data]) => `
+    <div class="claimed-row">
+      <span><strong>${escapeHTML(data.food)}</strong></span>
+      <span class="claimed-by">claimed by ${escapeHTML(person)}</span>
+    </div>
+  `).join('');
+}
+
+function escapeHTML(text){
+  return String(text)
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'",'&#039;');
+}
+
+function escapeJS(text){
+  return String(text).replaceAll("'", "\\'");
+}
+
+loadData();
 renderAll();
 </script>
 </body>
