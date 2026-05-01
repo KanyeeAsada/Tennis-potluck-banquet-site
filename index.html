@@ -42,6 +42,8 @@ button{background:linear-gradient(135deg,#8b5cf6,#c084fc);color:white;border:non
 
   <div class="card">
     <h2>Claimed Potluck Items</h2>
+    <input id="newItem" placeholder="Add a potluck item...">
+    <button onclick="addNewItem()">Add Item</button>
     <div id="itemBoard"></div>
   </div>
 </div>
@@ -74,7 +76,7 @@ button{background:linear-gradient(135deg,#8b5cf6,#c084fc);color:white;border:non
 <script>
 const people=['Olivia Swank','Charlotte Crosby','Kendall Hopkins','Julia Sagen','Jiyul Kim','Raya Olfatbahr','E Renzoni','Camden Hansen','Julia Franklin','Pimmada Akavanichan','Robi Marshall','Gigi Santos','Peyton Elliott','Natalie Saad','Naomi Adegbenro','Miriam Schneider','Narmin A.','Fay Alathari','Cat Hechter','Coach Valluri'];
 
-const foodItems=['Tortillas','Taco Meat','Chicken','Beans','Rice','Cheese','Lettuce','Salsa','Guacamole','Sour Cream','Chips','Queso','Drinks','Plates','Napkins','Utensils'];
+let foodItems=['Tortillas','Taco Meat','Chicken','Beans','Rice','Cheese','Lettuce','Salsa','Guacamole','Sour Cream','Chips','Queso','Drinks','Plates','Napkins','Utensils'];
 
 let signups={};
 let selectedPlayer='';
@@ -83,7 +85,7 @@ function openModal(player){
   selectedPlayer=player;
   document.getElementById('modalPlayerName').innerText=player;
 
-  // Hide already claimed items, but allow the player's current choice for editing
+  // Remove foods already claimed by OTHER people
   const takenFoods = Object.entries(signups)
     .filter(([name]) => name !== player)
     .map(([,data]) => data.food);
@@ -91,7 +93,10 @@ function openModal(player){
   const availableFoods = foodItems.filter(item => !takenFoods.includes(item));
 
   document.getElementById('foodSelect').innerHTML =
-    availableFoods.map(item => `<option ${signups[player]?.food===item?'selected':''}>${item}</option>`).join('');
+    '<option>Select an item</option>' +
+    availableFoods.map(item =>
+      `<option ${signups[player]?.food===item?'selected':''}>${item}</option>`
+    ).join('');
 
   document.getElementById('guestSelect').value = signups[player]?.guests ?? 0;
   document.getElementById('signupModal').style.display='flex';
@@ -99,6 +104,15 @@ function openModal(player){
 
 function closeModal(){
   document.getElementById('signupModal').style.display='none';
+}
+
+function addNewItem(){
+  const item = document.getElementById('newItem').value.trim();
+  if(item && !foodItems.includes(item)){
+    foodItems.push(item);
+    document.getElementById('newItem').value='';
+    renderAll();
+  }
 }
 
 function submitSignup(){
@@ -146,8 +160,11 @@ function renderAll(){
 
   // Claimed items list
   document.getElementById('itemBoard').innerHTML = Object.entries(signups).map(([person,data])=>`
-    <div><strong>${person}</strong> — ${data.food}</div>
-  `).join('') || '<p>No items claimed yet</p>';
+  <div style="padding:10px;margin:8px 0;background:#faf5ff;border-radius:12px;display:flex;justify-content:space-between;align-items:center;">
+    <span><strong>${data.food}</strong></span>
+    <span style="font-size:14px;color:#7c3aed;">claimed by ${person}</span>
+  </div>
+`).join('') || '<p>No items claimed yet</p>';
 }
 
 renderAll();
