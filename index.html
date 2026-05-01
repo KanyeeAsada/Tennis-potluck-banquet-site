@@ -9,7 +9,11 @@
 body{
   font-family:'Inter',sans-serif;
   background:#f4ebff;
-  background-image: radial-gradient(circle at 20px 20px,#d9f99d 8px,transparent 10px);
+  background-image:
+radial-gradient(circle at 40px 40px, #d9f99d 12px, transparent 13px),
+radial-gradient(circle at 120px 100px, #d9f99d 12px, transparent 13px),
+radial-gradient(circle at 200px 60px, #d9f99d 12px, transparent 13px);
+background-size: 220px 160px;
   color:#5b21b6;
   margin:0;
   padding:30px;
@@ -90,7 +94,7 @@ button{
 
 <script>
 const people=['Kendall Hopkins','Olivia Swank','Julia Sagen','Charlotte Crosby','Jiyul Kim','Raya Olfatbahr','E Renzoni','Julia Franklin','Camden Hansen','Pimmada Akavanichan','Robi Marshall','Gigi Santos','Peyton Elliott','Natalie Saad','Naomi Adegbenro','Miriam Schneider','Narmin A.','Fay Alathari','Cat Hechter','Coach Valluri'];
-let foodItems=JSON.parse(localStorage.getItem('foodItems'))||['Tortillas','Beans','Cheese','Balloons','Plates','Brownies','Cookies','Water Cases'];
+let foodItems=JSON.parse(localStorage.getItem('foodItems')) || [];
 let signups=JSON.parse(localStorage.getItem('potluckSignups'))||{};
 
 function save(){
@@ -116,7 +120,7 @@ function renderAll(){
  return `
  <div class="player-card">
    <h3>${person}</h3>
-   <div class="small">${s.memory||'Share a favorite tennis memory ✨'}</div>
+   <div class="small">${s.memory||'Click to sign up ✨'}</div>
    <textarea placeholder="Favorite tennis memory / hobbies" onchange="updatePerson('${person}','memory',this.value)">${s.memory||''}</textarea>
    <select onchange="updatePerson('${person}','food',this.value)">
      <option>Select an item</option>
