@@ -75,9 +75,9 @@ button{
 
   <div class="card">
     <div class="section-title">CURRENT POTLUCK ITEMS</div>
-    <input id="newItem" placeholder="Add a new dish or item...">
+    <input id="newItem" placeholder="Add taco/burrito item or supplies...">
     <button onclick="addNewItem()">Add</button>
-    <p class="small">ex: Tortillas, Beans, Cheese, Balloons, Plates</p>
+    <p class="small">ex: Tortillas, Taco Meat, Beans, Cheese, Salsa, Plates</p>
     <div id="itemBoard"></div>
   </div>
 
@@ -94,7 +94,24 @@ button{
 
 <script>
 const people=['Olivia Swank','Charlotte Crosby','Kendall Hopkins','Julia Sagen','Jiyul Kim','Raya Olfatbahr','E Renzoni','Camden Hansen','Julia Franklin','Pimmada Akavanichan','Robi Marshall','Gigi Santos','Peyton Elliott','Natalie Saad','Naomi Adegbenro','Miriam Schneider','Narmin A.','Fay Alathari','Cat Hechter','Coach Valluri'];
-let foodItems=JSON.parse(localStorage.getItem('foodItems')) || [];
+let foodItems=JSON.parse(localStorage.getItem('foodItems')) || [
+'Tortillas',
+'Taco Meat',
+'Chicken',
+'Beans',
+'Rice',
+'Cheese',
+'Lettuce',
+'Salsa',
+'Guacamole',
+'Sour Cream',
+'Chips',
+'Queso',
+'Drinks',
+'Plates',
+'Napkins',
+'Utensils'
+];
 let signups=JSON.parse(localStorage.getItem('potluckSignups')) || {
   'Julia Sagen': { food:'', guests:'0' },
   'Coach Valluri': { food:'', guests:'0' }
