@@ -9,6 +9,8 @@
 
 * { box-sizing: border-box; }
 body {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Ccircle cx='20' cy='20' r='10' fill='%23facc15' opacity='0.18'/%3E%3Cpath d='M15 20a5 5 0 0 1 10 0M20 15a5 5 0 0 1 0 10' stroke='%23ffffff' stroke-width='1.5' fill='none' opacity='0.35'/%3E%3C/svg%3E"),
   font-family: 'Inter', sans-serif;
   background:
     radial-gradient(circle at top left, rgba(216,180,254,.35), transparent 30%),
@@ -131,7 +133,7 @@ button:hover {
 
     <div class="card">
       <h2>Add New Potluck Item</h2>
-      <input id="newItem" placeholder="Ex: Paneer, Balloons, Ice, Cake" />
+      <input id="newItem" placeholder="Ex: Tortillas, Beans, Cheese, Balloons, Plates" />
       <button onclick="addNewItem()">Add Item</button>
     </div>
 
